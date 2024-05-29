@@ -12,7 +12,10 @@ class SigninController < ApplicationController
       # Rails.logger.info("current_user = #{current_user.payload}")
       response.set_cookie(JWTSessions.access_cookie,
                           value: tokens[:access],
-                          httponly: true,   #means that javascript of that page can't look into this information in the cookie. so attacks are prevented
+                          httponly: true,
+                          secure: Rails.env.production?, #means that javascript of that page can't look into this information in the cookie. so attacks are prevented
+                          path: '/',
+                          domain: :all
                           ) #secure: Rails.env.production?
       Rails.logger.info("signin-create-> cookies=#{response.cookies}")
 
