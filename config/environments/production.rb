@@ -79,6 +79,11 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+       config.session_store :cookie_store, key: '_your_app_session', secure: Rails.env.production?
+
+        # Ensure middleware for cookies is used
+        config.middleware.use ActionDispatch::Cookies
+        config.middleware.use ActionDispatch::Session::CookieStore, key: '_your_app_session', secure: Rails.env.production?
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [
