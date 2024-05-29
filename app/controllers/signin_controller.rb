@@ -9,9 +9,10 @@ class SigninController < ApplicationController
       Rails.logger.info("signin-create-> payload=#{payload}  ---  session=#{session}, ")
 
       tokens = session.login
+      # Rails.logger.info("current_user = #{current_user.payload}")
       response.set_cookie(JWTSessions.access_cookie,
                           value: tokens[:access],
-                          httponly: true,
+                          httponly: true,   #means that javascript of that page can't look into this information in the cookie. so attacks are prevented
                           secure: Rails.env.production?)
 
       Rails.logger.info("User #{user.id} logged in with tokens: #{tokens}")
@@ -23,7 +24,10 @@ class SigninController < ApplicationController
   end
 
   def destroy
-    session = JWTSessions::Session.new(payload: payload)
+    Rails.logger.info("signin-destroy-> payload=#{payload}")
+    Rails.logger.info("current_user= #{current_user.to_json}")
+
+    session = JWTSessions::Session.new(payload: payload, refresh_by_access_allowed: true)
     Rails.logger.info("signout-destroy-> payload=#{payload}  ---  session=#{session}, ")
     session.flush_by_access_payload
     render json: :ok
