@@ -24,15 +24,49 @@ class SigninController < ApplicationController
   end
 
   def destroy
-    Rails.logger.info("signin-destroy-> payload=#{payload}")
-    Rails.logger.info("current_user= #{current_user.to_json}")
+    if Rails.env.production?
+      begin
+        session = JWTSessions::Session.new(payload: access_payload)
+        session.flush_by_access_payload
+        Rails.logger.info("User #{access_payload[:user_id]} logged out")
+        render json: :ok
+      rescue JWTSessions::Errors::Unauthorized => e
+        Rails.logger.info("Failed to logout: #{e.message}")
+        render json: { error: 'Not authorized' }, status: :unauthorized
+      end
+    else
+      token = request.cookies[JWTSessions.access_cookie]
 
-    session = JWTSessions::Session.new(payload: payload, refresh_by_access_allowed: true)
-    Rails.logger.info("signout-destroy-> payload=#{payload}  ---  session=#{session}, ")
-    session.flush_by_access_payload
-    render json: :ok
+      Rails.logger.info("access_cookie => #{JWTSessions::Token.decode(token)[0]} ------- #{payload}")
+      session = JWTSessions::Session.new(payload: access_payload)
+      session.flush_by_access_payload
+      render json: :ok
+    end
+  end
+
+
+  private
+
+  def access_payload
+    token = request.cookies[JWTSessions.access_cookie]
+    Rails.logger.info("Access token: #{token}")
+    payload = JWTSessions::Token.decode(token)[0]
+    Rails.logger.info("Access payload: #{payload}")
+    payload
+  rescue JWTSessions::Errors::Unauthorized => e
+    Rails.logger.error("Token decode error: #{e.message}")
+    nil
   end
 end
+
+
+#this will also work fine as from frontend we are anyway deleting the csrf n all (just the sessions won't destroy)
+
+# def destroy
+#   render json: :ok
+# end
+
+
 
 
 #
