@@ -24,6 +24,9 @@ class SigninController < ApplicationController
   end
 
   def destroy
+    Rails.logger.info("inside the destroy method")
+    token = request.cookies[JWTSessions.access_cookie]
+    Rails.logger.info("access_cookie => #{JWTSessions::Token.decode(token)} ------- #{payload}")
     if Rails.env.production?
       token = request.cookies[JWTSessions.access_cookie]
       Rails.logger.info("access_cookie => #{JWTSessions::Token.decode(token)} ------- #{payload}")
