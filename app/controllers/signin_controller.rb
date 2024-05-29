@@ -25,28 +25,29 @@ class SigninController < ApplicationController
 
   def destroy
     Rails.logger.info("inside the destroy method")
-    token = request.cookies[JWTSessions.access_cookie]
-    Rails.logger.info("access_cookie => #{JWTSessions::Token.decode(token)} ------- #{payload}")
-    if Rails.env.production?
-      token = request.cookies[JWTSessions.access_cookie]
-      Rails.logger.info("access_cookie => #{JWTSessions::Token.decode(token)} ------- #{payload}")
-      begin
-        session = JWTSessions::Session.new(payload: access_payload)
-        session.flush_by_access_payload
-        Rails.logger.info("User #{access_payload[:user_id]} logged out")
-        render json: :ok
-      rescue JWTSessions::Errors::Unauthorized => e
-        Rails.logger.info("Failed to logout: #{e.message}")
-        render json: { error: 'Not authorized' }, status: :unauthorized
-      end
-    else
-      token = request.cookies[JWTSessions.access_cookie]
-
-      Rails.logger.info("access_cookie => #{JWTSessions::Token.decode(token)} ------- #{payload}")
-      session = JWTSessions::Session.new(payload: payload)
-      session.flush_by_access_payload
-      render json: :ok
-    end
+    render json: :ok
+    # token = request.cookies[JWTSessions.access_cookie]
+    # Rails.logger.info("access_cookie => #{JWTSessions::Token.decode(token)} ------- #{payload}")
+    # if Rails.env.production?
+    #   token = request.cookies[JWTSessions.access_cookie]
+    #   Rails.logger.info("access_cookie => #{JWTSessions::Token.decode(token)} ------- #{payload}")
+    #   begin
+    #     session = JWTSessions::Session.new(payload: access_payload)
+    #     session.flush_by_access_payload
+    #     Rails.logger.info("User #{access_payload[:user_id]} logged out")
+    #     render json: :ok
+    #   rescue JWTSessions::Errors::Unauthorized => e
+    #     Rails.logger.info("Failed to logout: #{e.message}")
+    #     render json: { error: 'Not authorized' }, status: :unauthorized
+    #   end
+    # else
+    #   token = request.cookies[JWTSessions.access_cookie]
+    #
+    #   Rails.logger.info("access_cookie => #{JWTSessions::Token.decode(token)} ------- #{payload}")
+    #   session = JWTSessions::Session.new(payload: payload)
+    #   session.flush_by_access_payload
+    #   render json: :ok
+    # end
   end
 
 
