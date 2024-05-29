@@ -25,9 +25,9 @@ class SigninController < ApplicationController
 
   def destroy
     if Rails.env.production?
+      token = request.cookies[JWTSessions.access_cookie]
+      Rails.logger.info("access_cookie => #{JWTSessions::Token.decode(token)} ------- #{payload}")
       begin
-        token = request.cookies[JWTSessions.access_cookie]
-        Rails.logger.info("access_cookie => #{JWTSessions::Token.decode(token)} ------- #{payload}")
         session = JWTSessions::Session.new(payload: access_payload)
         session.flush_by_access_payload
         Rails.logger.info("User #{access_payload[:user_id]} logged out")
@@ -52,7 +52,7 @@ class SigninController < ApplicationController
   def access_payload
     token = request.cookies[JWTSessions.access_cookie]
     Rails.logger.info("Access token: #{token}")
-    payload = JWTSessions::Token.decode(token)
+    payload = JWTSessions::Token.decode(token)[:ok]
     Rails.logger.info("Access payload: #{payload}")
     payload
   rescue JWTSessions::Errors::Unauthorized => e
