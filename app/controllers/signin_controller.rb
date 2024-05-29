@@ -13,7 +13,8 @@ class SigninController < ApplicationController
       response.set_cookie(JWTSessions.access_cookie,
                           value: tokens[:access],
                           httponly: true,   #means that javascript of that page can't look into this information in the cookie. so attacks are prevented
-                          secure: Rails.env.production?)
+                          ) #secure: Rails.env.production?
+      Rails.logger.info("signin-create-> cookies=#{response.cookies}")
 
       Rails.logger.info("User #{user.id} logged in with tokens: #{tokens}")
       render json: { csrf: tokens[:csrf] }
