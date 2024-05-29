@@ -6,6 +6,8 @@ class SigninController < ApplicationController
     if user&.authenticate(params[:password])
       payload = { user_id: user.id }
       session = JWTSessions::Session.new(payload: payload, refresh_by_access_allowed: true)
+      Rails.logger.info("signin-create-> payload=#{payload}  ---  session=#{session}, ")
+
       tokens = session.login
       response.set_cookie(JWTSessions.access_cookie,
                           value: tokens[:access],
@@ -22,6 +24,7 @@ class SigninController < ApplicationController
 
   def destroy
     session = JWTSessions::Session.new(payload: payload)
+    Rails.logger.info("signout-destroy-> payload=#{payload}  ---  session=#{session}, ")
     session.flush_by_access_payload
     render json: :ok
   end
