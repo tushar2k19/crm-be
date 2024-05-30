@@ -1,4 +1,5 @@
 class ConversationMessageController < ApplicationController
+  before_action :authorize_access_request!, only: [:send_message]
   def messages
     conv_id = params[:conversation_id]
     all_messages =[]
