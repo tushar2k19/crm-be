@@ -14,8 +14,10 @@ class SigninController < ApplicationController
                           value: tokens[:access],
                           httponly: true,   #means that javascript of that page can't look into this information in the cookie. so attacks are prevented
                           secure: Rails.env.production?,
-                          same_site: :none)
+                          same_site: :none,
+                          path: '/')
       Rails.logger.info("Set-Cookie header: #{response.get_header('Set-Cookie')}")
+      Rails.logger.info("respnse headers are set correctly #{response.header}")
       Rails.logger.info("signin-create-> cookies=#{response.cookies}")
 
       Rails.logger.info("User #{user.id} logged in with tokens: #{tokens}")
