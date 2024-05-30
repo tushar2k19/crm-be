@@ -60,7 +60,8 @@ class SigninController < ApplicationController
         begin
           session = JWTSessions::Session.new(payload: payload)
           session.flush_by_access_payload
-          Rails.logger.info("User #{access_payload[:user_id]} logged out")
+          Rails.logger.info("inside the destroy method with payload=#{payload}")
+          # Rails.logger.info("User #{access_payload[:user_id]} logged out")
           render json: :ok
         rescue JWTSessions::Errors::Unauthorized => e
           Rails.logger.info("Failed to logout: #{e.message}")
