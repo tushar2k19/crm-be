@@ -15,6 +15,7 @@ class SigninController < ApplicationController
                           httponly: true,   #means that javascript of that page can't look into this information in the cookie. so attacks are prevented
                           secure: Rails.env.production?,
                           same_site: :none)
+      Rails.logger.info("Set-Cookie header: #{response.get_header('Set-Cookie')}")
       Rails.logger.info("signin-create-> cookies=#{response.cookies}")
 
       Rails.logger.info("User #{user.id} logged in with tokens: #{tokens}")
@@ -55,7 +56,7 @@ class SigninController < ApplicationController
     def destroy
       if Rails.env.production?
         begin
-          session = JWTSessions::Session.new(payload: access_payload)
+          session = JWTSessions::Session.new(payload: payload)
           session.flush_by_access_payload
           Rails.logger.info("User #{access_payload[:user_id]} logged out")
           render json: :ok
