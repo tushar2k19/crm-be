@@ -6,21 +6,14 @@ class SigninController < ApplicationController
     if user&.authenticate(params[:password])
       payload = { user_id: user.id }
       session = JWTSessions::Session.new(payload: payload, refresh_by_access_allowed: true)
-      Rails.logger.info("signin-create-> payload=#{payload}  ---  session=#{session}, ")
 
       tokens = session.login
-      # Rails.logger.info("current_user = #{current_user.payload}")
       response.set_cookie(JWTSessions.access_cookie,
                           value: tokens[:access],
                           httponly: true,   #means that javascript of that page can't look into this information in the cookie. so attacks are prevented
                           secure: Rails.env.production?,   #sirf https par kaam karega
                           same_site: Rails.env.production? ? :none : :lax,   # works only when the site is secure (https) (had to do to because both out backend and frontend are running on different servers)
                           path: '/')
-      Rails.logger.info("Set-Cookie header: #{response.get_header('Set-Cookie')}")
-      Rails.logger.info("respnse headers are set correctly #{response.header}")
-      Rails.logger.info("signin-create-> cookies=#{response.cookies}")
-
-      Rails.logger.info("User #{user.id} logged in with tokens: #{tokens}")
       render json: { csrf: tokens[:csrf] }
     else
       Rails.logger.warn("Invalid login attempt for email: #{params[:email]}")
@@ -33,7 +26,6 @@ class SigninController < ApplicationController
     begin
       session = JWTSessions::Session.new(payload: payload)
       session.flush_by_access_payload
-      Rails.logger.info("inside the destroy method with payload=#{payload}")
       render json: :ok
     rescue JWTSessions::Errors::Unauthorized => e
       Rails.logger.info("Failed to logout: #{e.message}")
